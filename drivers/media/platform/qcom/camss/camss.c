@@ -1455,18 +1455,23 @@ static const struct media_device_ops camss_media_ops = {
 
 static int camss_configure_pd(struct camss *camss)
 {
+<<<<<<< HEAD
 	struct device *dev = camss->dev;
+=======
+	int nbr_pm_domains = 0;
+	int last_pm_domain = 0;
+>>>>>>> 7fd5d2e139bd0efb4a8506bcf1a099f58d9003d4
 	int i;
 	int ret;
 
-	camss->genpd_num = of_count_phandle_with_args(dev->of_node,
-						      "power-domains",
-						      "#power-domain-cells");
-	if (camss->genpd_num < 0) {
-		dev_err(dev, "Power domains are not defined for camss\n");
-		return camss->genpd_num;
-	}
+	if (camss->version == CAMSS_8x96 ||
+	    camss->version == CAMSS_660)
+		nbr_pm_domains = PM_DOMAIN_GEN1_COUNT;
+	else if (camss->version == CAMSS_845 ||
+		 camss->version == CAMSS_8250)
+		nbr_pm_domains = PM_DOMAIN_GEN2_COUNT;
 
+<<<<<<< HEAD
 	/*
 	 * If a platform device has just one power domain, then it is attached
 	 * at platform_probe() level, thus there shall be no need and even no
@@ -1492,6 +1497,9 @@ static int camss_configure_pd(struct camss *camss)
 	 * found in the list, it should be linked over here.
 	 */
 	for (i = 0; i < camss->genpd_num; i++) {
+=======
+	for (i = 0; i < nbr_pm_domains; i++) {
+>>>>>>> 7fd5d2e139bd0efb4a8506bcf1a099f58d9003d4
 		camss->genpd[i] = dev_pm_domain_attach_by_id(camss->dev, i);
 		if (IS_ERR(camss->genpd[i])) {
 			ret = PTR_ERR(camss->genpd[i]);
@@ -1718,11 +1726,32 @@ err_genpd_cleanup:
 
 void camss_delete(struct camss *camss)
 {
+<<<<<<< HEAD
+=======
+	int nbr_pm_domains = 0;
+	int i;
+
+>>>>>>> 7fd5d2e139bd0efb4a8506bcf1a099f58d9003d4
 	v4l2_device_unregister(&camss->v4l2_dev);
 	media_device_unregister(&camss->media_dev);
 	media_device_cleanup(&camss->media_dev);
 
 	pm_runtime_disable(camss->dev);
+<<<<<<< HEAD
+=======
+
+	if (camss->version == CAMSS_8x96 ||
+	    camss->version == CAMSS_660)
+		nbr_pm_domains = PM_DOMAIN_GEN1_COUNT;
+	else if (camss->version == CAMSS_845 ||
+		 camss->version == CAMSS_8250)
+		nbr_pm_domains = PM_DOMAIN_GEN2_COUNT;
+
+	for (i = 0; i < nbr_pm_domains; i++) {
+		device_link_del(camss->genpd_link[i]);
+		dev_pm_domain_detach(camss->genpd[i], true);
+	}
+>>>>>>> 7fd5d2e139bd0efb4a8506bcf1a099f58d9003d4
 }
 
 /*

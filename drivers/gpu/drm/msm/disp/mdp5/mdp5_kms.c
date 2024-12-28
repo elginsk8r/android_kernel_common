@@ -798,6 +798,9 @@ static int mdp5_init(struct platform_device *pdev, struct drm_device *dev)
 		goto fail;
 	}
 
+	/* set uninit-ed kms */
+	priv->kms = &mdp5_kms->base.base;
+
 	spin_lock_init(&mdp5_kms->resource_lock);
 
 	mdp5_kms->dev = dev;
@@ -837,9 +840,6 @@ static int mdp5_init(struct platform_device *pdev, struct drm_device *dev)
 	 * more optimal rate:
 	 */
 	clk_set_rate(mdp5_kms->core_clk, 200000000);
-
-	/* set uninit-ed kms */
-	priv->kms = &mdp5_kms->base.base;
 
 	pm_runtime_enable(&pdev->dev);
 	mdp5_kms->rpm_enabled = true;
@@ -896,6 +896,9 @@ static int mdp5_init(struct platform_device *pdev, struct drm_device *dev)
 fail:
 	if (mdp5_kms)
 		mdp5_destroy(mdp5_kms);
+
+	priv->kms = NULL;
+
 	return ret;
 }
 
